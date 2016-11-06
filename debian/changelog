@@ -1,0 +1,5 @@
+eeshow (0.git20161102-1) experimental; urgency=low
+
+  * Initial release. (Closes: #842211)
+
+ -- W. Martin Borgert <debacle@debian.org>  Sun, 06 Nov 2016 21:48:00 +0000

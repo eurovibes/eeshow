@@ -1,0 +1,31 @@
+Source: eeshow
+Maintainer: W. Martin Borgert <debacle@debian.org>
+Section: electronics
+Priority: optional
+Build-Depends: debhelper (>= 9),
+	fig2dev,
+	ghostscript,
+	git,
+	libgtk-3-dev,
+	libcairo2-dev,
+	libgit2-dev,
+	transfig,
+	imagemagick
+Standards-Version: 3.9.8
+Homepage: https://neo900.org/stuff/eeshow/
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/eeshow.git
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/eeshow.git
+
+Package: eeshow
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Recommends: xsel
+Description: Schematics renderer and viewer for KiCad
+ Eeshow is a collection of programs that read schematics made by KiCad
+ Eeschema and can be used as interactive viewer, or as a command-line
+ tool to convert schematics to PNG, PDF, Postscript, EPS, or FIG.
+ .
+ Eeshow can show the differences between two versions of schematics
+ sheets and it can retrieve files directly from a git repository.
+ .
+ Eeshow was developed as part of the Neo900 project.

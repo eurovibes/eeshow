@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE)
+	cd web && $(MAKE)
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=debian/eeshow PREFIX=/usr
