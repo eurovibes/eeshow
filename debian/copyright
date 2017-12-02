@@ -3,11 +3,11 @@ Upstream-Name: eeshow
 Source: https://neo900.org/git/eeshow/
 
 Files: *
-Copyright: 2016 Werner Almesberger <werner@almesberger.net>
+Copyright: 2016..2017 Werner Almesberger <werner@almesberger.net>
 License: GPL-2+
 
 Files: debian/*
-Copyright: 2016 W. Martin Borgert <debacle@debian.org>
+Copyright: 2016..2017 W. Martin Borgert <debacle@debian.org>
 License: GPL-2+
 
 License: GPL-2+
