@@ -98,7 +98,7 @@ static bool try_related(struct file *file)
 
 	tmp = file_graft_relative(file->related->name, file->name);
 	if (!tmp)
-		return NULL;
+		return 0;
 
 	if (*file->name == '/')
 		return 0;
@@ -197,7 +197,16 @@ bool file_open(struct file *file, const char *name, const struct file *related)
 {
 	file_init(file, name, related);
 
-	progress(2, "file_open: trying %s", name);
+	if (related) {
+		if (related->vcs)
+			progress(2, "file_open: trying %s (related %s, vcs)",
+			    name, related->name);
+		else
+			progress(2, "file_open: trying %s (related %s)",
+			    name, related->name);
+	} else {
+		progress(2, "file_open: trying %s", name);
+	}
 
 	if (related && related->vcs) {
 		file->vcs = open_vcs(file);
