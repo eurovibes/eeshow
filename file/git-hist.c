@@ -211,10 +211,14 @@ bool vcs_git_try(const char *path)
 	 * which would be at best confusing.
 	 */
 	if (git_repository_open_ext_caching(&repo, path,
-	    GIT_REPOSITORY_OPEN_CROSS_FS, NULL))
+	    GIT_REPOSITORY_OPEN_CROSS_FS, NULL)) {
+		perror_git(path);
 		return 0;
-	if (git_repository_is_empty(repo))
+	}
+	if (git_repository_is_empty(repo)) {
+		error("%s: repository is empty", path);
 		return 0;
+	}
 
 	/* check that the file is really in the repo */
 	if (!file_open_vcs(&file, path))
@@ -336,6 +340,15 @@ const char *vcs_git_summary(const struct vcs_hist *h)
 }
 
 
+/* Pango supports alpha values in background color only since 1.38 */
+
+#if PANGO_VERSION_MAJOR >= 1 || PANGO_VERSION_MINOR >= 38
+#define	BRANCH_BG	"background=\"#00e00080\""
+#else
+#define	BRANCH_BG	"background=\"#00e000\""
+#endif
+
+
 char *vcs_git_summary_for_pango(const struct vcs_hist *h,
     char *(*formatter)(const char *fmt, ...))
 {
@@ -349,8 +362,7 @@ char *vcs_git_summary_for_pango(const struct vcs_hist *h,
 
 	if (h->n_branches)
 		return formatter(
-		    "<small><span background=\"#00e00080\"><b>%s</b>%s</span>"
-		    " %s</small>",
+		    "<small><span " BRANCH_BG "><b>%s</b>%s</span> %s</small>",
 		    h->branches[0], h->n_branches > 1 ? "+" : "", summary);
 	else
 		return formatter("<small>%s</small>", summary);
@@ -394,7 +406,7 @@ char *vcs_git_long_for_pango(const struct vcs_hist *h,
 
 	for (i = 0; i != h->n_branches; i++)
 		s = append(s, formatter(
-		    "%s<span background=\"#00e00080\"><b> %s </b></span>",
+		    "%s<span " BRANCH_BG "><b> %s </b></span>",
 		    i ? " " : "", h->branches[i]));
 	s = append(s, formatter(
 	    "%s<b>%s</b> %s%s &lt;%s&gt;<small>\n%s%s</small>",

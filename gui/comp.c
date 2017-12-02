@@ -1,8 +1,8 @@
 /*
  * gui/comp.c - Component pop-up
  *
- * Written 2016 by Werner Almesberger
- * Copyright 2016 by Werner Almesberger
+ * Written 2016-2017 by Werner Almesberger
+ * Copyright 2016-2017 by Werner Almesberger
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +47,8 @@ struct comp_aoi_ctx {
 
 
 #define	COMP_W	100
+
+unsigned comp_pop_width = COMP_W;
 
 
 /* ----- Bounding box ------------------------------------------------------ */
@@ -166,10 +168,10 @@ static bool hover_comp(void *user, bool on, int dx, int dy)
 	overlay_remove_all(&gui->pop_overlays);
 	overlay_remove_all(&gui->pop_underlays);
 
-	add_pop_header(gui, COMP_W, ctx->ref);
+	add_pop_header(gui, comp_pop_width, ctx->ref);
 	for (item = ctx->items; item; item = item->next)
-		add_pop_item(gui, comp_click, (void *) item, COMP_W, 0,
-		    item->tag);
+		add_pop_item(gui, comp_click, (void *) item, comp_pop_width, 0,
+		    "%s", item->tag);
 	add_pop_frame(gui);
 
 	place_pop(gui, &ctx->bbox);
@@ -244,7 +246,8 @@ void add_comp_aoi(struct gui_sheet *sheet, const struct sch_obj *obj)
 			ctx->ref = f->txt.s;
 			break;
 		case 3:
-			ctx->doc = f->txt.s;
+			if (strcmp(f->txt.s, "~"))
+				ctx->doc = f->txt.s;
 			break;
 		default:
 			break;

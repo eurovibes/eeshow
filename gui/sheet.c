@@ -57,6 +57,12 @@ static void canvas_coord(const struct gui *gui,
 }
 
 
+static bool have_history(const struct gui *gui)
+{
+	return gui->vcs_history && !vcs_is_empty(gui->vcs_history);
+}
+
+
 /* ----- Zoom -------------------------------------------------------------- */
 
 
@@ -372,7 +378,7 @@ void go_to_sheet(struct gui *gui, struct gui_sheet *sheet)
 	gui->curr_sheet = sheet;
 	if (gui->old_hist)
 		render_delta(gui);
-	if (gui->vcs_history && !vcs_is_empty(gui->vcs_history))
+	if (have_history(gui))
 		do_revision_overlays(gui);
 	do_sheet_overlays(gui);
 	zoom_to_extents(gui);
@@ -419,16 +425,12 @@ static bool go_next_sheet(struct gui *gui)
 static bool sheet_click(void *user, int x, int y)
 {
 	struct gui *gui = user;
-	const struct gui_sheet *curr_sheet = gui->curr_sheet;
+	const struct gui_sheet *curr_sheet = current_sheet(gui);
 	int ex, ey;
 
 	canvas_coord(gui, x, y, &ex, &ey);
 	ex += curr_sheet->xmin;
 	ey += curr_sheet->ymin;
-
-	if (gui->old_hist && gui->diff_mode == diff_old)
-		curr_sheet = find_corresponding_sheet(gui->old_hist->sheets,
-		    gui->new_hist->sheets, gui->curr_sheet);
 
 	if (aoi_click(&gui->aois, x, y))
 		return 1;
@@ -449,14 +451,10 @@ static bool sheet_click(void *user, int x, int y)
 static bool sheet_hover_update(void *user, int x, int y)
 {
 	struct gui *gui = user;
-	const struct gui_sheet *curr_sheet = gui->curr_sheet;
+	const struct gui_sheet *curr_sheet = current_sheet(gui);
 	int ex, ey;
 
 	canvas_coord(gui, x, y, &ex, &ey);
-
-	if (gui->old_hist && gui->diff_mode == diff_old)
-		curr_sheet = find_corresponding_sheet(gui->old_hist->sheets,
-		    gui->new_hist->sheets, gui->curr_sheet);
 
 	if (aoi_hover(&gui->aois, x, y))
 		return 1;
@@ -468,7 +466,7 @@ static bool sheet_hover_update(void *user, int x, int y)
 static bool sheet_drag_begin(void *user, int x, int y)
 {
 	struct gui *gui = user;
-	const struct gui_sheet *curr_sheet = gui->curr_sheet;
+	const struct gui_sheet *curr_sheet = current_sheet(gui);
 	int ex, ey;
 	struct record_bbox rec_bbox;
 
@@ -477,10 +475,6 @@ static bool sheet_drag_begin(void *user, int x, int y)
 	canvas_coord(gui, x, y, &ex, &ey);
 	ex += curr_sheet->xmin;
 	ey += curr_sheet->ymin;
-
-	if (gui->old_hist && gui->diff_mode == diff_old)
-		curr_sheet = find_corresponding_sheet(gui->old_hist->sheets,
-		    gui->new_hist->sheets, gui->curr_sheet);
 
 	gui->drag_text = record_find_text_bbox(gfx_user(curr_sheet->gfx),
 	    show_extra, ex, ey, &rec_bbox);
@@ -603,11 +597,13 @@ static void sheet_key(void *user, int x, int y, int keyval)
 		break;
 	case GDK_KEY_Up:
 	case GDK_KEY_KP_Up:
-		show_history(gui, sel_new);
+		if (have_history(gui))
+			show_history(gui, sel_new);
 		break;
 	case GDK_KEY_Down:
 	case GDK_KEY_KP_Down:
-		show_history(gui, sel_old);
+		if (have_history(gui))
+			show_history(gui, sel_old);
 		break;
 	case GDK_KEY_Tab:
 	case GDK_KEY_KP_Tab:
@@ -634,21 +630,29 @@ static void sheet_key(void *user, int x, int y, int keyval)
 		break;
 
 	case GDK_KEY_n:
+		if (!have_history(gui))
+			break;
 		gui->diff_mode = diff_new;
 		do_revision_overlays(gui);
 		redraw(gui);
 		break;
 	case GDK_KEY_o:
+		if (!have_history(gui))
+			break;
 		gui->diff_mode = diff_old;
 		do_revision_overlays(gui);
 		redraw(gui);
 		break;
 	case GDK_KEY_d:
+		if (!have_history(gui))
+			break;
 		gui->diff_mode = diff_delta;
 		do_revision_overlays(gui);
 		redraw(gui);
 		break;
 	case GDK_KEY_D:	/* Shift + D */
+		if (!have_history(gui))
+			break;
 		use_delta = !use_delta;
 		do_revision_overlays(gui);
 		redraw(gui);

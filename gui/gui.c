@@ -46,6 +46,15 @@
 /* ----- Helper functions -------------------------------------------------- */
 
 
+struct gui_sheet *sheets(const struct gui *gui)
+{
+	if (gui->old_hist && gui->diff_mode == diff_old)
+		return gui->old_hist->sheets;
+	else
+		return gui->new_hist->sheets;
+}
+
+
 struct gui_sheet *find_corresponding_sheet(struct gui_sheet *pick_from,
     struct gui_sheet *ref_in, const struct gui_sheet *ref)
 {
@@ -71,6 +80,15 @@ struct gui_sheet *find_corresponding_sheet(struct gui_sheet *pick_from,
 
 	/* plan C: just go to the top */
 	return pick_from;
+}
+
+
+struct gui_sheet *current_sheet(const struct gui *gui)
+{
+	if (!gui->old_hist || gui->diff_mode != diff_old)
+		return gui->curr_sheet;
+	return find_corresponding_sheet(gui->old_hist->sheets,
+	    gui->new_hist->sheets, gui->curr_sheet);
 }
 
 
@@ -367,6 +385,10 @@ static void add_hist(void *user, struct vcs_hist *h,
 		prev = *anchor;
 		age++;
 	}
+
+	/* @@@ should free the string returned by vcs_git_get_rev */
+	progress(1, "processing revision %s",
+	    h && h->commit ? vcs_git_get_rev(h) : "(uncommitted)");
 
 	hist = alloc_type(struct gui_hist);
 	hist->gui = gui;
