@@ -1,3 +1,10 @@
+eeshow (0.git20170731-2) experimental; urgency=medium
+
+  * bump standards version and dh compat
+  * move package to electronics team and salsa.d.o
+
+ -- W. Martin Borgert <debacle@debian.org>  Sat, 05 May 2018 18:44:25 +0000
+
 eeshow (0.git20170731-1) experimental; urgency=medium
 
   * new upstream snapshot
