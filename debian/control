@@ -11,7 +11,9 @@ Build-Depends: debhelper (>= 11),
 	libcairo2-dev,
 	libgit2-dev,
 	transfig,
-	imagemagick
+	imagemagick,
+	bison,
+	flex
 Standards-Version: 4.1.4
 Rules-Requires-Root: no
 Homepage: https://neo900.org/stuff/eeshow/
