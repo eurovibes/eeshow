@@ -1,0 +1,37 @@
+--- a/kicad/sch.h
++++ b/kicad/sch.h
+@@ -25,6 +25,7 @@
+ 
+ enum sch_state {
+ 	sch_basic,	/* basic state */
++	sch_bitmap,	/* bitmap */
+ 	sch_descr,	/* prelude and description */
+ 	sch_comp,	/* component */
+ 	sch_sheet,	/* sub-sheet */
+--- a/kicad/sch-parse.c
++++ b/kicad/sch-parse.c
+@@ -462,6 +462,10 @@
+ 
+ 	switch (ctx->state) {
+ 	case sch_basic:
++		if (sscanf(line, "$Bitmap%n", &n) == 0 && n) {
++			ctx->state = sch_bitmap;
++			return 1;
++		}
+ 		if (sscanf(line, "$Comp%n", &n) == 0 && n) {
+ 			ctx->state = sch_comp;
+ 			obj->u.comp.fields = NULL;
+@@ -721,6 +725,13 @@
+ 		return 1;
+ 	case sch_eof:
+ 		return 1;
++	case sch_bitmap:
++		if (sscanf(line, "$EndBitmap%n", &n) == 0 && n) {
++			ctx->state = sch_basic;
++			return 1;
++		}
++		/* Ignore Bitmaps for now */
++		return 1;
+ 	default:
+ 		BUG("invalid state %d", ctx->state);
+ 	}
