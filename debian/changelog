@@ -1,3 +1,11 @@
+eeshow (0.git20170731-2.1) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * Handle bitmaps in schematics
+  * Add library symbol table support
+
+ -- Benedikt Spranger <b.spranger@linutronix.de>  Mon, 16 Dec 2019 10:37:17 +0100
+
 eeshow (0.git20170731-2) experimental; urgency=medium
 
   * bump standards version and dh compat
